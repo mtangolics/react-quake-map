@@ -64,7 +64,7 @@ class QuakeMap extends Component {
     if(props == null || props.quakeList == null) {
       return [];
     }
-    return props.quakeList.map(function(q,idx) {
+    return props.quakeList.map((q,idx) => {
          return {
            position: {
              lat: q.geometry.coordinates[1],
@@ -73,7 +73,7 @@ class QuakeMap extends Component {
            key: 'quake' + idx,
            defaultAnimation: 2,
            infoContent: (
-             <div className="quakeInfo">
+             <div className="quake-info">
                <h5 style={QUAKE_INFO_STYLE.h5}>{q.properties.title}</h5>
                <table>
                  <tbody>
@@ -130,10 +130,10 @@ class QuakeMap extends Component {
     return (
         <TheGoogleMap
           containerElement={
-            <div className="googleMapContainer" style={{ height: `100%` }} />
+            <div className="google-map-container" style={{ height: '100%' }} />
           }
           mapElement={
-            <div className="googleMapElement" style={{ height: `100%` }} />
+            <div className="google-map-element" style={{ height: '100%' }} />
           }
           onMapLoad={this.handleMapLoad}
           onMapClick={this.handleMapClick}

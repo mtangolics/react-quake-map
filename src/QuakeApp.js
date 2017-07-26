@@ -3,23 +3,20 @@ import axios from 'axios';
 import QuakeListItem from './components/QuakeListItem';
 import QuakeMap from './components/QuakeMap';
 import FormControls from './components/FormControls';
+import moment from 'moment';
 
 const APP_STYLE = {
-  'clear': 'both'
+  'clear': 'both',
+  'height': '100vh'
 };
 
 const LIST_CONTAINER_STYLE = {
   'margin': 'auto',
   'width': '50vw',
-  'height': '100vh',
+  'height': '100%',
   'overflowY': 'auto',
   'float': 'left',
   'position': 'relative'
-};
-
-const LIST_ITEM_STYLE = {
-  'borderBottom': '1px solid #ccc',
-  'clear': 'both'
 };
 
 const LIST_HEADER_DIV_STYLE = {
@@ -52,7 +49,7 @@ const LIST_HEADER_STYLE = {
 
 const MAP_CONTAINER_STYLE = {
   'width': '50vw',
-  'height': '100vh',
+  'height': '100%',
   'float': 'left'
 };
 
@@ -62,24 +59,27 @@ class QuakeApp extends Component {
     super();
     this.state = {
       data: [],
-      minMagnitude: 2.5
+      minMagnitude: 2.5,
+      startDate: moment().subtract(1, 'days'),
+      endDate: null,
+      formIsDirty: false
     };
   }
 
   fetchData() {
-    let dayAgo = new Date(Date.now() - 86400000);
 
     axios.get('https://earthquake.usgs.gov/fdsnws/event/1/query',{
       params: {
         'format': 'geojson',
-        'starttime': dayAgo.toISOString(),
+        'starttime': this.state.startDate.format(),// dayAgo.toISOString(),
         'minmagnitude': this.state.minMagnitude
       }
     })
     .then((response) => {
       if(response && response.data) {
         this.setState({
-          data: response.data.features
+          data: response.data.features,
+          formIsDirty: false
         });
       }
     })
@@ -89,7 +89,7 @@ class QuakeApp extends Component {
   }
 
   componentDidUpdate(prevProps,prevState) {
-    if(this.state.minMagnitude !== prevState.minMagnitude) {
+    if(this.state.formIsDirty) {
       this.fetchData();
     }
   }
@@ -100,24 +100,29 @@ class QuakeApp extends Component {
 
   render() {
     const listItems = this.state.data.map((quake) =>
-      <QuakeListItem quakeData={quake} key={quake.id} style={LIST_ITEM_STYLE}/>
+      <QuakeListItem quakeData={quake} key={quake.id}/>
     );
     return (
-      <div style={APP_STYLE} className="QuakeApp">
-        <form className="QuakeApp-form">
-          <FormControls magonchange={this.handleMagChange} magvalue={this.state.minMagnitude}/>
-        </form>
-        <div className="QuakeApp-mapContainer" style={MAP_CONTAINER_STYLE}>
+      <div style={APP_STYLE} className="quake-app">
+        <FormControls 
+          magonchange={this.handleMagChange} 
+          magvalue={this.state.minMagnitude} 
+          onStartDateChange={this.handleStartDateChange} 
+          onEndDateChange={this.handleEndDateChange} 
+          startDate={this.state.startDate} 
+          endDate={this.state.endDate}
+        />
+        <div className="map-container" style={MAP_CONTAINER_STYLE}>
           <QuakeMap quakeList={this.state.data}/>
         </div>
-        <div className="QuakeApp-listContainer" style={LIST_CONTAINER_STYLE}>
-          <div className="QuakeApp-list-header" style={LIST_HEADER_STYLE}>
+        <div className="list-container" style={LIST_CONTAINER_STYLE}>
+          <div className="list-header" style={LIST_HEADER_STYLE}>
             <div className="mag-header" style={LIST_HEADER_MAG_STYLE}>Mag</div>
             <div className="depth-header" style={LIST_HEADER_DEPTH_STYLE}>Depth</div>
             <div className="loc-header" style={LIST_HEADER_DIV_STYLE}>Location</div>
             <div className="time-header" style={LIST_HEADER_TIME_STYLE}>Time</div>
           </div>
-          <ul className="QuakeApp-list" style={{'marginTop': '38px'}}>
+          <ul className="list" style={{'marginTop': '38px'}}>
             {listItems}
           </ul>
         </div>
@@ -125,10 +130,25 @@ class QuakeApp extends Component {
     );
   }
 
-  handleMagChange = (val) => {
-    console.log('handleMagChange received: ' + val);
+  handleStartDateChange = (d) => {
+
     this.setState({
-      minMagnitude: val
+      startDate: d,
+      formIsDirty: !d.isSame(this.state.startDate)
+    });
+  }
+
+  handleEndDateChange = (d) => {
+    this.setState({
+      endDate: d,
+      formIsDirty: !d.isSame(this.state.endDate)
+    });
+  }
+
+  handleMagChange = (val) => {
+    this.setState({
+      minMagnitude: val,
+      formIsDirty: val !== this.state.minMagnitude
     });
   }
 }
