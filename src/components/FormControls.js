@@ -4,19 +4,18 @@ import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-const LABEL_STYLE = {
-  'display': 'inline-block',
-  'margin': '0 10px 0 10px'
-}
-
 const FormControls = (props) => {
     return (
       <form className="form-controls">
         <MagnitudeSlider onchange={props.magonchange} value={props.magvalue}/>
-        <label style={LABEL_STYLE}>Timeframe Start</label>
-        <DatePicker onChange={props.onStartDateChange} selected={props.startDate}/>
-        <label style={LABEL_STYLE}>Timeframe End</label>
-        <DatePicker onChange={props.onEndDateChange} selected={props.endDate} placeholderText="Present" />
+        <div className="form-block">
+          <label>Timeframe Start</label>
+          <DatePicker className="datepicker" onChange={props.onStartDateChange} selected={props.startDate}/>
+        </div>
+        <div className="form-block">
+          <label>Timeframe End</label>
+          <DatePicker className="datepicker" onChange={props.onEndDateChange} selected={props.endDate} placeholderText="Present" />
+        </div>
       </form>
     );
 };

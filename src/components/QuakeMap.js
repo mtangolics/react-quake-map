@@ -128,19 +128,19 @@ class QuakeMap extends Component {
 
   render() {
     return (
-        <TheGoogleMap
-          containerElement={
-            <div className="google-map-container" style={{ height: '100%' }} />
-          }
-          mapElement={
-            <div className="google-map-element" style={{ height: '100%' }} />
-          }
-          onMapLoad={this.handleMapLoad}
-          onMapClick={this.handleMapClick}
-          markers={this.state.markers}
-          onMarkerClick={this.handleMarkerClick}
-          onMarkerClose={this.handleMarkerClose}
-        />
+      <TheGoogleMap
+        containerElement={
+          <div className="google-map-container" style={{ height: '100%' }} />
+        }
+        mapElement={
+          <div className="google-map-element" style={{ height: '100%' }} />
+        }
+        onMapLoad={this.handleMapLoad}
+        onMapClick={this.handleMapClick}
+        markers={this.state.markers}
+        onMarkerClick={this.handleMarkerClick}
+        onMarkerClose={this.handleMarkerClose}
+      />
     );
   }
 }
