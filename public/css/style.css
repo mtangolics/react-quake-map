@@ -60,7 +60,7 @@ span.bold {
   position: relative;
 }
 
-.list-header:after {
+.clearfix:after {
   content: "";
   display: table;
   clear: both;
@@ -68,7 +68,7 @@ span.bold {
 
 .list-header .header {
   float: left;
-  padding: 0 10px 10px 10px;
+  padding: 0 10px 0 10px;
   font-weight: bold;
 }
 
@@ -78,8 +78,50 @@ span.bold {
 }
 
 .header.time {
-  padding-left: 0;
+  padding-left: 10px;
   width: 120px;
   text-align: left;
   float: right;
+}
+
+.quake-info a {
+    font-size: 11px;
+    text-align: left;
+}
+
+.quake-info h5 {
+  margin-bottom: 10px;
+}
+
+.quake-info td {
+    padding-left: 0;
+    font-size: 11px;
+    text-align: left;
+}
+
+.highlighted {
+  background-color: yellow;
+}
+
+.quakelist-item {
+  border-bottom: 1px solid #ccc;
+  clear: both;
+  
+}
+
+.quakelist-item div {
+  float: left;
+  padding: 10px;
+  width: 50px;
+  text-align: left;
+  height: 38px;
+}
+
+.quakelist-item .quake-time {
+  float: right;
+  width: 120px;
+}
+
+.quakelist-item .quake-loc {
+  width: auto;
 }

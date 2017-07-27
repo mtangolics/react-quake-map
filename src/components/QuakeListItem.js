@@ -1,47 +1,26 @@
 import React from 'react';
 import moment from 'moment';
 
-const LIST_ITEM_DIV_STYLE = {
-  'float': 'left',
-  'padding': '10px',
-  'width': '50px',
-  'textAlign': 'left'
-};
-
-const LIST_ITEM_TIME_STYLE = {
-  'float': 'right',
-  'textAlign': 'left',
-  'width': '120px'
-};
-
-const LIST_ITEM_LOC_STYLE = {
-  'float': 'left',
-  'padding': '10px',
-  'textAlign': 'left'
-};
-
-const LIST_ITEM_STYLE = {
-  'borderBottom': '1px solid #ccc',
-  'clear': 'both',
-  'height': '38px'
-};
 
 const QuakeListItem = (props) => {
     const qProps = props.quakeData.properties;
     const qGeom = props.quakeData.geometry;
 
+    const isSelected = props.selectedQuakes.includes(props.quakeData.id);
+    const clsName = 'quakelist-item clearfix' + (isSelected ? ' highlighted' : '');
+
     return (
-      <li className="quakelist-item" style={LIST_ITEM_STYLE}>
-        <div className="quake-mag" style={LIST_ITEM_DIV_STYLE}>
+      <li className={clsName}>
+        <div className="quake-mag">
           {qProps.mag >= 4 ? <span className="bold">{qProps.mag}</span> : qProps.mag}
         </div>
-        <div className="quake-depth" style={LIST_ITEM_DIV_STYLE}>
+        <div className="quake-depth">
           {Math.round(qGeom.coordinates[2])}km
         </div>
-        <div className="quake-loc" style={LIST_ITEM_LOC_STYLE}>
+        <div className="quake-loc">
           {qProps.place}
         </div>
-        <div className="quake-time" title={new Date(qProps.time).toISOString()} style={LIST_ITEM_TIME_STYLE}>
+        <div className="quake-time" title={new Date(qProps.time).toISOString()}>
           {moment(qProps.time).fromNow()}
         </div>
       </li>

@@ -15,23 +15,32 @@ class QuakeApp extends Component {
       minMagnitude: 2.5,
       startDate: moment().subtract(1, 'days'),
       endDate: null,
-      formIsDirty: false
+      formIsDirty: false,
+      selectedQuakes: [],
+      mapMarkers: []
     };
   }
 
   fetchData() {
 
-    axios.get('https://earthquake.usgs.gov/fdsnws/event/1/query',{
-      params: {
+      var params = {
         'format': 'geojson',
         'starttime': this.state.startDate.format(),
         'minmagnitude': this.state.minMagnitude
+      };
+
+      if(this.state.endDate !== null) {
+        params['endtime'] = this.state.endDate.format()
       }
+
+    axios.get('https://earthquake.usgs.gov/fdsnws/event/1/query',{
+      params
     })
     .then((response) => {
       if(response && response.data) {
         this.setState({
           data: response.data.features,
+          mapMarkers: this.markerizeData(response.data.features),
           formIsDirty: false
         });
       }
@@ -66,10 +75,10 @@ class QuakeApp extends Component {
         </div>
         <div className="row">
           <div className="map-container col-md-6">
-            <QuakeMap quakeList={this.state.data} />
+            <QuakeMap onMarkerClick={this.handleMarkerClick} onMarkerClose={this.handleMarkerClose} markers={this.state.mapMarkers} handleMapLoad={this.handleMapLoad} />
           </div>
           <div className="list-container col-md-6">
-            <QuakeList data={this.state.data} />
+            <QuakeList data={this.state.data} selectedQuakes={this.state.selectedQuakes} />
           </div>
         </div>
       </div>
@@ -96,6 +105,68 @@ class QuakeApp extends Component {
       minMagnitude: val,
       formIsDirty: val !== this.state.minMagnitude
     });
+  }
+
+  handleMarkerClose = (targetMarker) => {
+    this.setState({
+      mapMarkers: this.state.mapMarkers.map(marker => {
+        if (marker === targetMarker) {
+          return {
+            ...marker,
+            showInfo: false,
+          };
+        }
+        return marker;
+      }),
+      selectedQuakes: this.state.selectedQuakes.filter((id) => { return id !== targetMarker.key })
+    });
+  }
+
+  handleMarkerClick = (targetMarker) => {
+    this.setState({
+      mapMarkers: this.state.mapMarkers.map(marker => {
+        if (marker === targetMarker) {
+          return {
+            ...marker,
+            showInfo: true,
+          };
+        }
+        return marker;
+      }),
+      selectedQuakes: !this.state.selectedQuakes.includes(targetMarker.key) ? [...this.state.selectedQuakes,targetMarker.key] : this.state.selectedQuakes 
+    });
+  }
+
+  handleMapLoad = (map) => {
+    this._mapComponent = map;
+  }
+
+  markerizeData(quakeList) {
+    if(quakeList == null) {
+      return [];
+    }
+    return quakeList.map((q,idx) => {
+         return {
+           position: {
+             lat: q.geometry.coordinates[1],
+             lng: q.geometry.coordinates[0]
+           },
+           key: q.id,
+           defaultAnimation: 2,
+           infoContent: (
+             <div className="quake-info">
+               <h5>{q.properties.title}</h5>
+               <table>
+                 <tbody>
+                   <tr><td>Tsunami:</td><td>{q.properties.tsunami === 0 ? 'No' : 'Yes'}</td></tr>
+                   <tr><td>Alert Level:</td><td>{q.properties.alert ? q.properties.alert : 'None'}</td></tr>
+                   <tr><td><a href={q.properties.url} target="_blank">More Details</a></td></tr>
+                 </tbody>
+               </table>
+             </div>
+           )
+         }
+       });
   }
 }
 
